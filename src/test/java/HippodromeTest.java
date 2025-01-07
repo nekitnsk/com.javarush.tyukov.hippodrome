@@ -4,7 +4,9 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mockStatic;
@@ -13,7 +15,7 @@ class HippodromeTest {
 
     @Test
     @DisplayName("Тест конструктора Hippodrome с первым параметром Null")
-    public void testConstructorWithNullList(){
+    public void testConstructorWithNullList() {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             new Hippodrome(null);
@@ -23,7 +25,7 @@ class HippodromeTest {
 
     @Test
     @DisplayName("при передаче в конструктор пустого списка, выброшенное исключение будет содержать сообщение Horses cannot be empty")
-    public void testConstructorWithEmptyList(){
+    public void testConstructorWithEmptyList() {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             new Hippodrome(List.of());
@@ -36,7 +38,7 @@ class HippodromeTest {
     void getHorses() {
         List<Horse> horses = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
-            horses.add(new Horse("Horse "+i, i, i / 2));
+            horses.add(new Horse("Horse " + i, i, i / 2));
         }
 
         Hippodrome hippodrome = new Hippodrome(horses);
@@ -58,11 +60,24 @@ class HippodromeTest {
         for (Horse horse : horses) {
             Mockito.verify(horse).move();
         }
-
-
     }
 
     @Test
+    @DisplayName("Проверить, что метод возвращает лошадь с самым большим значением distance.")
     void getWinner() {
+
+        List<Horse> horses = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < 50; i++) {
+            horses.add(Mockito.spy(new Horse("Name", 25, 0.1D +(100D-0.1D) * random.nextDouble())));
+        }
+
+
+        Hippodrome hippodrome = Mockito.spy(new Hippodrome(horses));
+
+        assertEquals(horses.stream().max(Comparator.comparing(Horse::getDistance)).get(), hippodrome.getWinner());
+
     }
+
+
 }
